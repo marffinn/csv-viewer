@@ -138,7 +138,6 @@ function App() {
     <div className="app">
       <nav className="navbar">
         <div className="nav-brand">
-          <img src="/logo Starfix - wersja z cieniem RGB - białe tło i carna obwódka i napis czarny.png" alt="Logo" className="logo" />
           CSV Viewer
         </div>
         <div className="nav-controls">
