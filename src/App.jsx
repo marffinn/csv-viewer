@@ -13,23 +13,97 @@ function App() {
   const [editValue, setEditValue] = useState('')
   const [fileName, setFileName] = useState('')
   const [imagePreview, setImagePreview] = useState({ show: false, url: '', x: 0, y: 0 })
+  const [rawFileContent, setRawFileContent] = useState('')
+  const [contextMenu, setContextMenu] = useState({ show: false, x: 0, y: 0, rowIndex: -1 })
   const fileInputRef = useRef(null)
 
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0]
-    if (file) {
-      setFileName(file.name)
-      Papa.parse(file, {
-        delimiter: separator,
+  const detectSeparator = (content) => {
+    const separators = [';', ',', '\t']
+    const firstLine = content.split('\n')[0]
+    let bestSeparator = ';'
+    let maxColumns = 0
+
+    separators.forEach(sep => {
+      const columns = firstLine.split(sep).length
+      if (columns > maxColumns) {
+        maxColumns = columns
+        bestSeparator = sep
+      }
+    })
+
+    return bestSeparator
+  }
+
+  const parseCSVContent = (content, delimiter) => {
+    return new Promise((resolve) => {
+      Papa.parse(content, {
+        delimiter,
         header: false,
         complete: (results) => {
           if (results.data.length > 0) {
-            setHeaders(results.data[0])
-            setCsvData(results.data.slice(1))
+            resolve({
+              headers: results.data[0],
+              data: results.data.slice(1)
+            })
+          } else {
+            resolve({ headers: [], data: [] })
           }
         }
       })
+    })
+  }
+
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0]
+    if (file) {
+      setFileName(file.name)
+      const content = await file.text()
+      setRawFileContent(content)
+      
+      const detectedSeparator = detectSeparator(content)
+      setSeparator(detectedSeparator)
+      
+      const parsed = await parseCSVContent(content, detectedSeparator)
+      setHeaders(parsed.headers)
+      setCsvData(parsed.data)
     }
+  }
+
+  const handleSeparatorChange = async (newSeparator) => {
+    setSeparator(newSeparator)
+    if (rawFileContent) {
+      const parsed = await parseCSVContent(rawFileContent, newSeparator)
+      setHeaders(parsed.headers)
+      setCsvData(parsed.data)
+    }
+  }
+
+  const handleRowRightClick = (e, rowIndex) => {
+    e.preventDefault()
+    setContextMenu({
+      show: true,
+      x: e.clientX,
+      y: e.clientY,
+      rowIndex
+    })
+  }
+
+  const addRow = (index) => {
+    const newRow = new Array(headers.length).fill('')
+    const newData = [...csvData]
+    newData.splice(index + 1, 0, newRow)
+    setCsvData(newData)
+    setContextMenu({ show: false, x: 0, y: 0, rowIndex: -1 })
+  }
+
+  const deleteRow = (index) => {
+    const newData = csvData.filter((_, i) => i !== index)
+    setCsvData(newData)
+    setContextMenu({ show: false, x: 0, y: 0, rowIndex: -1 })
+  }
+
+  const hideContextMenu = () => {
+    setContextMenu({ show: false, x: 0, y: 0, rowIndex: -1 })
   }
 
   const handleCellEdit = (rowIndex, colIndex) => {
@@ -135,7 +209,7 @@ function App() {
   }
 
   return (
-    <div className="app">
+    <div className="app" onClick={hideContextMenu}>
       <nav className="navbar">
         <div className="nav-brand">
           CSV Viewer
@@ -168,7 +242,7 @@ function App() {
 
           <div className="control-group">
             <label>Field Separator</label>
-            <select className="form-select" value={separator} onChange={(e) => setSeparator(e.target.value)}>
+            <select className="form-select" value={separator} onChange={(e) => handleSeparatorChange(e.target.value)}>
               <option value=";">Semicolon (;)</option>
               <option value=",">Comma (,)</option>
               <option value="\t">Tab</option>
@@ -222,7 +296,7 @@ function App() {
             </thead>
             <tbody>
               {filteredData.map((row, rowIndex) => (
-                <tr key={rowIndex}>
+                <tr key={rowIndex} onContextMenu={(e) => handleRowRightClick(e, rowIndex)}>
                   <td className="row-header">{rowIndex + 1}</td>
                   {headers.map((_, colIndex) => (
                     <td key={colIndex}>
@@ -269,6 +343,24 @@ function App() {
           }}
         >
           <img src={imagePreview.url} alt="Preview" />
+        </div>
+      )}
+
+      {contextMenu.show && (
+        <div
+          className="context-menu"
+          style={{
+            left: contextMenu.x,
+            top: contextMenu.y
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="context-menu-item" onClick={() => addRow(contextMenu.rowIndex)}>
+            Add Row Below
+          </div>
+          <div className="context-menu-item" onClick={() => deleteRow(contextMenu.rowIndex)}>
+            Delete Row
+          </div>
         </div>
       )}
     </div>
