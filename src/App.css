@@ -15,16 +15,20 @@ body {
   height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: #313131;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.171) 1px, transparent 0);
+  background-size: 30px 30px;
+  background-position: -5px -5px;
 }
 
 .navbar {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 1rem 1.5rem;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  padding: 0.75rem 1rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1rem;
   flex-wrap: wrap;
 }
 
@@ -45,7 +49,7 @@ body {
 .nav-controls {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 0.75rem;
   flex-wrap: wrap;
 }
 
@@ -53,7 +57,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  min-width: 120px;
+  min-width: 100px;
 }
 
 .control-group label {
@@ -79,32 +83,32 @@ body {
 }
 
 .btn-primary {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
   color: white;
-  border: 1px solid rgba(255,255,255,0.3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .btn-primary:hover {
-  background: rgba(255,255,255,0.3);
+  background: rgba(255, 255, 255, 0.3);
   transform: translateY(-1px);
 }
 
 .btn-secondary {
-  background: rgba(255,255,255,0.15);
+  background: rgba(255, 255, 255, 0.15);
   color: white;
-  border: 1px solid rgba(255,255,255,0.25);
+  border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 .btn-secondary:hover {
-  background: rgba(255,255,255,0.25);
+  background: rgba(255, 255, 255, 0.25);
   transform: translateY(-1px);
 }
 
 .form-select {
   padding: 0.5rem;
-  border: 1px solid rgba(255,255,255,0.3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 4px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   color: white;
   font-size: 0.875rem;
   backdrop-filter: blur(10px);
@@ -119,8 +123,8 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 4px;
   padding: 0.5rem;
   backdrop-filter: blur(10px);
@@ -136,14 +140,14 @@ body {
 }
 
 .search-input input::placeholder {
-  color: rgba(255,255,255,0.7);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .file-info {
   font-size: 0.75rem;
   opacity: 0.8;
   padding: 0.5rem;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
   max-width: 200px;
   overflow: hidden;
@@ -157,7 +161,7 @@ body {
   background: white;
   margin: 1rem;
   border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .csv-table {
@@ -198,26 +202,85 @@ body {
   background: #e3f2fd !important;
 }
 
-.csv-table td:nth-child(2) { background: #fff5f5; }
-.csv-table td:nth-child(3) { background: #f0fff4; }
-.csv-table td:nth-child(4) { background: #f0f8ff; }
-.csv-table td:nth-child(5) { background: #fffaf0; }
-.csv-table td:nth-child(6) { background: #f5f0ff; }
-.csv-table td:nth-child(7) { background: #fff0f5; }
-.csv-table td:nth-child(8) { background: #f0ffff; }
-.csv-table td:nth-child(9) { background: #fffff0; }
-.csv-table td:nth-child(10) { background: #f8f8ff; }
-.csv-table td:nth-child(11) { background: #f5fffa; }
-.csv-table td:nth-child(12) { background: #fdf5e6; }
-.csv-table td:nth-child(13) { background: #f0f0f0; }
-.csv-table td:nth-child(14) { background: #ffefd5; }
-.csv-table td:nth-child(15) { background: #e6e6fa; }
-.csv-table td:nth-child(16) { background: #faf0e6; }
-.csv-table td:nth-child(17) { background: #e0ffff; }
-.csv-table td:nth-child(18) { background: #fff8dc; }
-.csv-table td:nth-child(19) { background: #f5deb3; }
-.csv-table td:nth-child(20) { background: #ffe4e1; }
-.csv-table td:nth-child(n+21) { background: #f0f8f0; }
+.csv-table td:nth-child(2) {
+  background: #fff5f5;
+}
+
+.csv-table td:nth-child(3) {
+  background: #f0fff4;
+}
+
+.csv-table td:nth-child(4) {
+  background: #f0f8ff;
+}
+
+.csv-table td:nth-child(5) {
+  background: #fffaf0;
+}
+
+.csv-table td:nth-child(6) {
+  background: #f5f0ff;
+}
+
+.csv-table td:nth-child(7) {
+  background: #fff0f5;
+}
+
+.csv-table td:nth-child(8) {
+  background: #f0ffff;
+}
+
+.csv-table td:nth-child(9) {
+  background: #fffff0;
+}
+
+.csv-table td:nth-child(10) {
+  background: #f8f8ff;
+}
+
+.csv-table td:nth-child(11) {
+  background: #f5fffa;
+}
+
+.csv-table td:nth-child(12) {
+  background: #fdf5e6;
+}
+
+.csv-table td:nth-child(13) {
+  background: #f0f0f0;
+}
+
+.csv-table td:nth-child(14) {
+  background: #ffefd5;
+}
+
+.csv-table td:nth-child(15) {
+  background: #e6e6fa;
+}
+
+.csv-table td:nth-child(16) {
+  background: #faf0e6;
+}
+
+.csv-table td:nth-child(17) {
+  background: #e0ffff;
+}
+
+.csv-table td:nth-child(18) {
+  background: #fff8dc;
+}
+
+.csv-table td:nth-child(19) {
+  background: #f5deb3;
+}
+
+.csv-table td:nth-child(20) {
+  background: #ffe4e1;
+}
+
+.csv-table td:nth-child(n+21) {
+  background: #f0f8f0;
+}
 
 .row-header {
   background: #e9ecef !important;
@@ -229,7 +292,7 @@ body {
   border-right: 2px solid #dee2e6 !important;
 }
 
-.csv-table td > div {
+.csv-table td>div {
   padding: 4px 8px;
   min-height: 24px;
   cursor: cell;
@@ -240,7 +303,7 @@ body {
   align-items: center;
 }
 
-.csv-table td > div:hover {
+.csv-table td>div:hover {
   background: rgba(0, 123, 255, 0.1);
 }
 
@@ -253,6 +316,13 @@ body {
   background: white;
   outline: 2px solid #007bff;
   border-radius: 2px;
+}
+
+.csv-table td.selected {
+  outline: 2px solid #007bff;
+  outline-offset: -2px;
+  position: relative;
+  z-index: 1;
 }
 
 .image-link {
@@ -272,7 +342,7 @@ body {
   background: white;
   border: 2px solid #dee2e6;
   border-radius: 8px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   padding: 8px;
   width: 200px;
   height: 200px;
@@ -298,7 +368,7 @@ body {
   background: white;
   margin: 1rem;
   border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .empty svg {
@@ -320,7 +390,7 @@ body {
   background: white;
   border: 1px solid #dee2e6;
   border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 1000;
   min-width: 120px;
 }
@@ -340,6 +410,210 @@ body {
   background: #f8f9fa;
 }
 
+.context-menu-divider {
+  height: 1px;
+  background: #dee2e6;
+  margin: 4px 0;
+}
+
+.app.dragging::before {
+  content: 'Drop CSV file here';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(102, 126, 234, 0.9);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 600;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.app.dark {
+  background: #1a1a1a;
+}
+
+.app.dark body {
+  background: #1a1a1a;
+  color: #e0e0e0;
+}
+
+.app.dark .table-container {
+  background: #2d2d2d;
+}
+
+.app.dark .csv-table th {
+  background: #3a3a3a;
+  border-color: #4a4a4a;
+  color: #e0e0e0;
+}
+
+.app.dark .csv-table td {
+  border-color: #4a4a4a;
+}
+
+.app.dark .csv-table tbody tr:nth-child(even) {
+  background: #2d2d2d;
+}
+
+.app.dark .csv-table tbody tr:nth-child(odd) {
+  background: #333;
+}
+
+.app.dark .csv-table tbody tr:hover {
+  background: #3a4a5a !important;
+}
+
+.app.dark .csv-table td:nth-child(2) {
+  background: #3a2a2a;
+}
+
+.app.dark .csv-table td:nth-child(3) {
+  background: #2a3a2a;
+}
+
+.app.dark .csv-table td:nth-child(4) {
+  background: #2a2a3a;
+}
+
+.app.dark .csv-table td:nth-child(5) {
+  background: #3a3a2a;
+}
+
+.app.dark .csv-table td:nth-child(6) {
+  background: #3a2a3a;
+}
+
+.app.dark .csv-table td:nth-child(7) {
+  background: #3a2a2f;
+}
+
+.app.dark .csv-table td:nth-child(8) {
+  background: #2a3a3a;
+}
+
+.app.dark .csv-table td:nth-child(9) {
+  background: #3a3a2f;
+}
+
+.app.dark .csv-table td:nth-child(10) {
+  background: #2f2f3a;
+}
+
+.app.dark .csv-table td:nth-child(11) {
+  background: #2a3a2f;
+}
+
+.app.dark .csv-table td:nth-child(12) {
+  background: #3a2f2a;
+}
+
+.app.dark .csv-table td:nth-child(13) {
+  background: #2f2f2f;
+}
+
+.app.dark .csv-table td:nth-child(14) {
+  background: #3a3a2a;
+}
+
+.app.dark .csv-table td:nth-child(15) {
+  background: #2f2a3a;
+}
+
+.app.dark .csv-table td:nth-child(16) {
+  background: #3a2f2a;
+}
+
+.app.dark .csv-table td:nth-child(17) {
+  background: #2a3a3a;
+}
+
+.app.dark .csv-table td:nth-child(18) {
+  background: #3a3a2a;
+}
+
+.app.dark .csv-table td:nth-child(19) {
+  background: #3a2f2a;
+}
+
+.app.dark .csv-table td:nth-child(20) {
+  background: #3a2a2a;
+}
+
+.app.dark .csv-table td:nth-child(n+21) {
+  background: #2a3a2a;
+}
+
+.app.dark .row-header {
+  background: #3a3a3a !important;
+  color: #b0b0b0;
+  border-right-color: #4a4a4a !important;
+}
+
+.app.dark .csv-table td>div {
+  color: #e0e0e0;
+}
+
+.app.dark .csv-table td input {
+  background: #2d2d2d;
+  color: #e0e0e0;
+}
+
+.app.dark .empty {
+  background: #2d2d2d;
+  color: #b0b0b0;
+}
+
+.app.dark .empty h2 {
+  color: #e0e0e0;
+}
+
+.app.dark .context-menu {
+  background: #2d2d2d;
+  border-color: #4a4a4a;
+}
+
+.app.dark .context-menu-item {
+  color: #e0e0e0;
+  border-bottom-color: #3a3a3a;
+}
+
+.app.dark .context-menu-item:hover {
+  background: #3a3a3a;
+}
+
+.app.dark .context-menu-divider {
+  background: #4a4a4a;
+}
+
+.app.dark .image-preview {
+  background: #2d2d2d;
+  border-color: #4a4a4a;
+}
+
+.footer {
+  background: rgba(0, 0, 0, 0.05);
+  padding: 0.5rem 1rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: #6c757d;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.app.dark .footer {
+  background: rgba(0, 0, 0, 0.3);
+  color: #b0b0b0;
+  border-top-color: #4a4a4a;
+}
+
 @media (max-width: 768px) {
   .navbar {
     padding: 1rem;
@@ -347,20 +621,20 @@ body {
     align-items: stretch;
     gap: 1rem;
   }
-  
+
   .nav-controls {
     justify-content: center;
     gap: 1rem;
   }
-  
+
   .control-group {
     min-width: auto;
   }
-  
+
   .search-input input {
     width: 150px;
   }
-  
+
   .table-container {
     margin: 0.5rem;
   }
