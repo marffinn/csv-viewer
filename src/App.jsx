@@ -1,6 +1,7 @@
-import { useState, useRef, useMemo } from 'react'
+import { useState, useRef, useMemo, useEffect } from 'react'
 import Papa from 'papaparse'
 import { Upload, Download, Search } from 'lucide-react'
+import ThemeSwitch from './ThemeSwitch'
 import './App.css'
 
 function App() {
@@ -14,8 +15,14 @@ function App() {
   const [fileName, setFileName] = useState('')
   const [imagePreview, setImagePreview] = useState({ show: false, url: '', x: 0, y: 0 })
   const [rawFileContent, setRawFileContent] = useState('')
-  const [contextMenu, setContextMenu] = useState({ show: false, x: 0, y: 0, rowIndex: -1 })
+  const [contextMenu, setContextMenu] = useState({ show: false, x: 0, y: 0, rowIndex: -1, colIndex: -1 })
+  const [isDragging, setIsDragging] = useState(false)
+  const [selectedCell, setSelectedCell] = useState({ row: -1, col: -1 })
+  const [darkTheme, setDarkTheme] = useState(true)
+  const [editingHeader, setEditingHeader] = useState(-1)
+  const [editHeaderValue, setEditHeaderValue] = useState('')
   const fileInputRef = useRef(null)
+  const appRef = useRef(null)
 
   const detectSeparator = (content) => {
     const separators = [';', ',', '\t']
@@ -55,18 +62,7 @@ function App() {
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0]
-    if (file) {
-      setFileName(file.name)
-      const content = await file.text()
-      setRawFileContent(content)
-      
-      const detectedSeparator = detectSeparator(content)
-      setSeparator(detectedSeparator)
-      
-      const parsed = await parseCSVContent(content, detectedSeparator)
-      setHeaders(parsed.headers)
-      setCsvData(parsed.data)
-    }
+    await loadFile(file)
   }
 
   const handleSeparatorChange = async (newSeparator) => {
@@ -78,32 +74,107 @@ function App() {
     }
   }
 
-  const handleRowRightClick = (e, rowIndex) => {
+  const handleCellRightClick = (e, rowIndex, colIndex) => {
     e.preventDefault()
     setContextMenu({
       show: true,
       x: e.clientX,
       y: e.clientY,
-      rowIndex
+      rowIndex,
+      colIndex
     })
   }
 
-  const addRow = (index) => {
+  const addRowAbove = (index) => {
+    const newRow = new Array(headers.length).fill('')
+    const newData = [...csvData]
+    newData.splice(index, 0, newRow)
+    setCsvData(newData)
+    setContextMenu({ show: false, x: 0, y: 0, rowIndex: -1, colIndex: -1 })
+  }
+
+  const addRowBelow = (index) => {
     const newRow = new Array(headers.length).fill('')
     const newData = [...csvData]
     newData.splice(index + 1, 0, newRow)
     setCsvData(newData)
-    setContextMenu({ show: false, x: 0, y: 0, rowIndex: -1 })
+    setContextMenu({ show: false, x: 0, y: 0, rowIndex: -1, colIndex: -1 })
   }
 
   const deleteRow = (index) => {
     const newData = csvData.filter((_, i) => i !== index)
     setCsvData(newData)
-    setContextMenu({ show: false, x: 0, y: 0, rowIndex: -1 })
+    setContextMenu({ show: false, x: 0, y: 0, rowIndex: -1, colIndex: -1 })
+  }
+
+  const addColumnBefore = (index) => {
+    const newHeaders = [...headers]
+    newHeaders.splice(index, 0, 'New Column')
+    setHeaders(newHeaders)
+    const newData = csvData.map(row => {
+      const newRow = [...row]
+      newRow.splice(index, 0, '')
+      return newRow
+    })
+    setCsvData(newData)
+    setContextMenu({ show: false, x: 0, y: 0, rowIndex: -1, colIndex: -1 })
+  }
+
+  const addColumnAfter = (index) => {
+    const newHeaders = [...headers]
+    newHeaders.splice(index + 1, 0, 'New Column')
+    setHeaders(newHeaders)
+    const newData = csvData.map(row => {
+      const newRow = [...row]
+      newRow.splice(index + 1, 0, '')
+      return newRow
+    })
+    setCsvData(newData)
+    setContextMenu({ show: false, x: 0, y: 0, rowIndex: -1, colIndex: -1 })
+  }
+
+  const deleteColumn = (index) => {
+    const newHeaders = headers.filter((_, i) => i !== index)
+    setHeaders(newHeaders)
+    const newData = csvData.map(row => row.filter((_, i) => i !== index))
+    setCsvData(newData)
+    setContextMenu({ show: false, x: 0, y: 0, rowIndex: -1, colIndex: -1 })
   }
 
   const hideContextMenu = () => {
     setContextMenu({ show: false, x: 0, y: 0, rowIndex: -1 })
+  }
+
+  const loadFile = async (file) => {
+    if (file && (file.type === 'text/csv' || file.name.endsWith('.csv'))) {
+      setFileName(file.name)
+      const content = await file.text()
+      setRawFileContent(content)
+
+      const detectedSeparator = detectSeparator(content)
+      setSeparator(detectedSeparator)
+
+      const parsed = await parseCSVContent(content, detectedSeparator)
+      setHeaders(parsed.headers)
+      setCsvData(parsed.data)
+    }
+  }
+
+  const handleDragOver = (e) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = (e) => {
+    e.preventDefault()
+    setIsDragging(false)
+  }
+
+  const handleDrop = async (e) => {
+    e.preventDefault()
+    setIsDragging(false)
+    const file = e.dataTransfer.files[0]
+    await loadFile(file)
   }
 
   const handleCellEdit = (rowIndex, colIndex) => {
@@ -111,17 +182,73 @@ function App() {
     setEditValue(csvData[rowIndex][colIndex] || '')
   }
 
+  const handleCellClick = (rowIndex, colIndex) => {
+    setSelectedCell({ row: rowIndex, col: colIndex })
+  }
+
+  const handleKeyDown = (e) => {
+    if (editingCell) return
+    if (selectedCell.row === -1 || selectedCell.col === -1) return
+
+    let newRow = selectedCell.row
+    let newCol = selectedCell.col
+
+    switch (e.key) {
+      case 'ArrowUp':
+        e.preventDefault()
+        newRow = Math.max(0, selectedCell.row - 1)
+        break
+      case 'ArrowDown':
+        e.preventDefault()
+        newRow = Math.min(filteredData.length - 1, selectedCell.row + 1)
+        break
+      case 'ArrowLeft':
+        e.preventDefault()
+        newCol = Math.max(0, selectedCell.col - 1)
+        break
+      case 'ArrowRight':
+        e.preventDefault()
+        newCol = Math.min(headers.length - 1, selectedCell.col + 1)
+        break
+      case 'Enter':
+        e.preventDefault()
+        handleCellEdit(selectedCell.row, selectedCell.col)
+        return
+      default:
+        return
+    }
+
+    setSelectedCell({ row: newRow, col: newCol })
+  }
+
   const handleSaveEdit = () => {
     if (editingCell) {
       const newData = [...csvData]
       newData[editingCell.row][editingCell.col] = editValue
       setCsvData(newData)
+      setSelectedCell({ row: editingCell.row, col: editingCell.col })
       setEditingCell(null)
       setEditValue('')
+      setTimeout(() => appRef.current?.focus(), 0)
     }
   }
 
-  const handleDownload = () => {
+  const handleHeaderEdit = (index) => {
+    setEditingHeader(index)
+    setEditHeaderValue(headers[index] || '')
+  }
+
+  const handleSaveHeader = () => {
+    if (editingHeader !== -1) {
+      const newHeaders = [...headers]
+      newHeaders[editingHeader] = editHeaderValue
+      setHeaders(newHeaders)
+      setEditingHeader(-1)
+      setEditHeaderValue('')
+    }
+  }
+
+  const handleDownload = (overwrite = false) => {
     const csvContent = [headers, ...csvData]
       .map(row => row.map(cell => `"${cell || ''}"`).join(separator))
       .join('\n')
@@ -130,7 +257,7 @@ function App() {
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = fileName || 'data.csv'
+    a.download = overwrite && fileName ? fileName : (fileName || 'data.csv')
     a.click()
     window.URL.revokeObjectURL(url)
   }
@@ -143,6 +270,31 @@ function App() {
       )
     )
   }, [csvData, searchTerm])
+
+  useEffect(() => {
+    const existingScript = document.querySelector('script[data-name="bmc-button"]')
+    if (existingScript) {
+      return
+    }
+
+    const script = document.createElement('script')
+    script.type = 'text/javascript'
+    script.src = 'https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js'
+    script.dataset.name = 'bmc-button'
+    script.dataset.slug = 'marffinnz'
+    script.dataset.color = '#5F7FFF'
+    script.dataset.emoji = '🌮'
+    script.dataset.font = 'Cookie'
+    script.dataset.text = 'Buy me a kebab'
+    script.dataset.outlineColor = '#000000'
+    script.dataset.fontColor = '#ffffff'
+    script.dataset.coffeeColor = '#FFDD00'
+    document.body.appendChild(script)
+
+    return () => {
+      script.remove()
+    }
+  }, [])
 
   const isImageUrl = (text) => {
     if (!text) return false
@@ -209,7 +361,16 @@ function App() {
   }
 
   return (
-    <div className="app" onClick={hideContextMenu}>
+    <div
+      ref={appRef}
+      className={`app ${isDragging ? 'dragging' : ''} ${darkTheme ? 'dark' : ''}`}
+      onClick={hideContextMenu}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+    >
       <nav className="navbar">
         <div className="nav-brand">
           CSV Viewer
@@ -274,12 +435,7 @@ function App() {
             </div>
           )}
 
-          {fileName && (
-            <div className="control-group">
-              <label>Current File</label>
-              <div className="file-info">{fileName}</div>
-            </div>
-          )}
+
         </div>
       </nav>
 
@@ -290,16 +446,41 @@ function App() {
               <tr>
                 <th className="row-header"></th>
                 {headers.map((header, index) => (
-                  <th key={index} style={{ resize: 'horizontal', overflow: 'hidden' }}>{header}</th>
+                  <th key={index} style={{ resize: 'horizontal', overflow: 'hidden' }}>
+                    {editingHeader === index ? (
+                      <input
+                        value={editHeaderValue}
+                        onChange={(e) => setEditHeaderValue(e.target.value)}
+                        onBlur={handleSaveHeader}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleSaveHeader()
+                          if (e.key === 'Escape') {
+                            setEditingHeader(-1)
+                            setEditHeaderValue('')
+                          }
+                        }}
+                        autoFocus
+                        style={{ width: '100%', background: 'transparent', border: 'none', color: 'inherit', fontSize: 'inherit', fontWeight: 'inherit' }}
+                      />
+                    ) : (
+                      <div onDoubleClick={() => handleHeaderEdit(index)} style={{ cursor: 'pointer' }}>
+                        {header}
+                      </div>
+                    )}
+                  </th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {filteredData.map((row, rowIndex) => (
-                <tr key={rowIndex} onContextMenu={(e) => handleRowRightClick(e, rowIndex)}>
+                <tr key={rowIndex}>
                   <td className="row-header">{rowIndex + 1}</td>
                   {headers.map((_, colIndex) => (
-                    <td key={colIndex}>
+                    <td
+                      key={colIndex}
+                      className={selectedCell.row === rowIndex && selectedCell.col === colIndex ? 'selected' : ''}
+                      onContextMenu={(e) => handleCellRightClick(e, rowIndex, colIndex)}
+                    >
                       {editingCell?.row === rowIndex && editingCell?.col === colIndex ? (
                         <input
                           value={editValue}
@@ -315,7 +496,10 @@ function App() {
                           autoFocus
                         />
                       ) : (
-                        <div onClick={() => handleCellEdit(rowIndex, colIndex)}>
+                        <div
+                          onClick={() => handleCellClick(rowIndex, colIndex)}
+                          onDoubleClick={() => handleCellEdit(rowIndex, colIndex)}
+                        >
                           {formatCellContent(row[colIndex])}
                         </div>
                       )}
@@ -355,13 +539,33 @@ function App() {
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="context-menu-item" onClick={() => addRow(contextMenu.rowIndex)}>
+          <div className="context-menu-item" onClick={() => addRowAbove(contextMenu.rowIndex)}>
+            Add Row Above
+          </div>
+          <div className="context-menu-item" onClick={() => addRowBelow(contextMenu.rowIndex)}>
             Add Row Below
           </div>
           <div className="context-menu-item" onClick={() => deleteRow(contextMenu.rowIndex)}>
             Delete Row
           </div>
+          <div className="context-menu-divider"></div>
+          <div className="context-menu-item" onClick={() => addColumnBefore(contextMenu.colIndex)}>
+            Add Column Before
+          </div>
+          <div className="context-menu-item" onClick={() => addColumnAfter(contextMenu.colIndex)}>
+            Add Column After
+          </div>
+          <div className="context-menu-item" onClick={() => deleteColumn(contextMenu.colIndex)}>
+            Delete Column
+          </div>
         </div>
+      )}
+
+      {fileName && (
+        <footer className="footer">
+          <div>{fileName}</div>
+          <ThemeSwitch checked={darkTheme} onChange={() => setDarkTheme(!darkTheme)} />
+        </footer>
       )}
     </div>
   )

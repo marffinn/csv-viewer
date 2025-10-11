@@ -2,7 +2,7 @@
 
 Welcome to the CSV Viewer & Editor hosted on GitHub Pages! 🚀
 
-**Live Demo:** https://github.com/marffinn/csv-viewer
+**Live Demo:** https://marffinn.github.io/csv-viewer/
 
 If you enjoy using this tool and would like to support its development, consider buying me a coffee ☕
 
