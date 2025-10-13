@@ -1,0 +1,12 @@
+directories:
+  output: release
+  buildResources: build
+appId: com.csvviewer.app
+productName: CSV Viewer
+files:
+  - filter:
+      - dist/**/*
+      - electron.cjs
+win:
+  target: nsis
+electronVersion: 38.2.2
