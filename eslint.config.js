@@ -26,4 +26,15 @@ export default defineConfig([
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
     },
   },
+  {
+    files: ['build-icon.js', 'electron.cjs'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+      parserOptions: {
+        sourceType: 'commonjs',
+      },
+    },
+  },
 ])
